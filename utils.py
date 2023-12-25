@@ -1,67 +1,126 @@
-# -*- coding:utf-8 -*-
+from datetime import datetime
+import base64
+import json
+import secrets
+import urllib.parse
+import uuid
+import webbrowser
+from collections.abc import Iterable
+from dataclasses import dataclass
+
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
+
+from models.search import SearchQuery
 
 
-from config import parsers
-# transformer库是一个把各种预训练模型集成在一起的库，导入之后，你就可以选择性的使用自己想用的模型，这里使用的BERT模型。
-# 所以导入了bert模型，和bert的分词器，这里是对bert的使用，而不是bert自身的源码。
-from transformers import BertTokenizer
-from torch.utils.data import Dataset, DataLoader
+def is_valid_date(date_str: str):
+    try:
+        datetime.strptime(date_str, '%Y-%m-%d')
+        return True
+    except ValueError:
+        return False
 
 
-def read_data(file):
-    # 读取文件
-    all_data = open(file, "r", encoding="utf-8").read().split("\n")
-    # 得到所有文本、所有标签、句子的最大长度
-    texts, labels, max_length = [], [], []
-    for data in all_data:
-        if data:
-            text, label = data.rsplit("\t", 1)
-            max_length.append(len(text))
-            texts.append(text)
-            labels.append(label)
-
-    return texts, labels
-
-
-class MyDataset(Dataset):
-    def __init__(self, texts, labels, with_labels=True):
-        self.all_text = texts
-        self.all_label = labels
-        self.max_len = parsers().max_len
-        self.with_labels = with_labels
-        self.tokenizer = BertTokenizer.from_pretrained(parsers().bert_pred)
-
-    def __getitem__(self, index):
-        text = self.all_text[index]
-
-        # Tokenize the pair of sentences to get token ids, attention masks and token type ids
-        encoded_pair = self.tokenizer(text,
-                                      padding='max_length',  # Pad to max_length
-                                      truncation=True,  # Truncate to max_length
-                                      max_length=self.max_len,
-                                      return_tensors='pt')  # Return torch.Tensor objects
-
-        token_ids = encoded_pair['input_ids'].squeeze(0)  # tensor of token ids  torch.Size([max_len])
-        attn_masks = encoded_pair['attention_mask'].squeeze(
-            0)  # binary tensor with "0" for padded values and "1" for the other values  torch.Size([max_len])
-        token_type_ids = encoded_pair['token_type_ids'].squeeze(
-            0)  # binary tensor with "0" for the 1st sentence tokens & "1" for the 2nd sentence tokens  torch.Size([max_len])
-
-        if self.with_labels:  # True if the dataset has labels
-            label = int(self.all_label[index])
-            return token_ids, attn_masks, token_type_ids, label
-        else:
-            return token_ids, attn_masks, token_type_ids
-
-    def __len__(self):
-        # 得到文本的长度
-        return len(self.all_text)
+def pack_query(q: SearchQuery) -> str:
+    terms = []
+    if len(q.term) > 0:
+        terms.append(q.term)
+    if len(q.username) > 0:
+        terms.append(f'@{q.username}')
+    if len(q.category) > 0:
+        terms.append(f'category:{q.category}')
+    if len(q.before) > 0 and is_valid_date(q.before):
+        terms.append(f'before:{q.before}')
+    if len(q.after) > 0 and is_valid_date(q.after):
+        terms.append(f'after:{q.after}')
+    if len(q.order.value) > 0:
+        terms.append(f'order:{q.order.value}')
+    if len(q.status.value) > 0:
+        terms.append(f'status:{q.status.value}')
+    if len(q.in_whats) > 0:
+        for in_what in q.in_whats:
+            terms.append(f'in:{in_what.value}')
+    return '  '.join(terms)
 
 
-if __name__ == "__main__":
-    train_text, train_label = read_data("./data/train.txt")
-    print(train_text[0], train_label[0])
-    trainDataset = MyDataset(train_text, labels=train_label, with_labels=True)
-    trainDataloader = DataLoader(trainDataset, batch_size=3, shuffle=False)
-    for i, batch in enumerate(trainDataloader):
-        print(batch[0], batch[1], batch[2], batch[3])
+SITE_URL_BASE = 'https://shuiyuan.sjtu.edu.cn'
+ALL_SCOPES = [
+    'read',
+    'write',
+    'message_bus',
+    'push',
+    'one_time_password',
+    'notifications',
+    'session_info',
+    'bookmarks_calendar',
+    'user_status',
+]
+DEFAULT_SCOPES = ['read']
+
+
+@dataclass
+class UserApiKeyPayload:
+    key: str
+    nonce: str
+    push: bool
+    api: int
+
+
+@dataclass
+class UserApiKeyRequestResult:
+    client_id: str
+    payload: UserApiKeyPayload
+
+# author: https://shuiyuan.sjtu.edu.cn/t/topic/123808
+def generate_user_api_key(
+    application_name: str, *,
+    client_id: str | None = None,
+    scopes: Iterable[str] | None = None,
+) -> UserApiKeyRequestResult:
+    # Generate RSA key pair.
+    private_key = rsa.generate_private_key(
+        public_exponent=65537,
+        key_size=4096,
+    )
+    public_key = private_key.public_key()
+    public_key_pem = public_key.public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo,
+    ).decode('ascii')
+
+    # Generate a random client ID if not provided.
+    client_id_to_use = str(uuid.uuid4()) if client_id is None else client_id
+    nonce = secrets.token_urlsafe(32)
+
+    # Validate scopes.
+    scopes_list = DEFAULT_SCOPES if scopes is None else list(scopes)
+    if not set(scopes_list) <= set(ALL_SCOPES):
+        raise ValueError('Invalid scopes')
+
+    # Build request URL and open in browser.
+    params_dict: dict[str, str] = {
+        'application_name': application_name,
+        'client_id': client_id_to_use,
+        'scopes': ','.join(scopes_list),
+        'public_key': public_key_pem,
+        'nonce': nonce,
+    }
+    params_str = '&'.join(
+        f'{k}={urllib.parse.quote(v)}' for k, v in params_dict.items())
+    webbrowser.open(f'{SITE_URL_BASE}/user-api-key/new?{params_str}')
+
+    # Receive, decrypt and check response payload from server.
+    enc_payload = input('Paste the response payload here: ')
+    dec_payload = UserApiKeyPayload(**json.loads(private_key.decrypt(
+        base64.b64decode(enc_payload),
+        padding.PKCS1v15(),
+    )))
+    if dec_payload.nonce != nonce:
+        raise ValueError('Nonce mismatch')
+
+    # Return client ID and response payload.
+    return UserApiKeyRequestResult(
+        client_id=client_id_to_use,
+        payload=dec_payload,
+    )
