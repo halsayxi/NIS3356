@@ -35,8 +35,7 @@ def main():
 
     response = requests.request("POST", url, headers=headers, data=payload)
 
-    print(response.text)
-
+    return json.loads(response.text)["result"]  # 只返回result字段的值
 
 def get_access_token():
     """
@@ -46,7 +45,3 @@ def get_access_token():
     url = "https://aip.baidubce.com/oauth/2.0/token"
     params = {"grant_type": "client_credentials", "client_id": API_KEY, "client_secret": SECRET_KEY}
     return str(requests.post(url, params=params).json().get("access_token"))
-
-
-if __name__ == '__main__':
-    main()
