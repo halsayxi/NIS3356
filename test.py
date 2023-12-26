@@ -113,10 +113,20 @@ def text_class_name(text, pred, args, output_file, tree):
         if len(results) != 1:
             for i in range(len(results)):
                 file.write(f"文本：{text[i]}\t预测的类别为：{classification_dict[results[i]]}\n")
-                tree.insert('', 'end', values=(text[i], classification_dict[results[i]]))
+                item = tree.insert('', 'end', values=(text[i], classification_dict[results[i]]))
+                # 设置每一行的背景色
+                if i % 2 == 0:
+                    tree.item(item, tags='evenrow')
+                else:
+                    tree.item(item, tags='oddrow')
         else:
             file.write(f"文本：{text}\t预测的类别为：{classification_dict[results[0]]}\n")
-            tree.insert('', 'end', values=(text, classification_dict[results[0]]))
+            item = tree.insert('', 'end', values=(text, classification_dict[results[0]]))
+            tree.item(item, tags='evenrow')
+
+    # 设置行的背景色
+    tree.tag_configure('evenrow', background='white')
+    tree.tag_configure('oddrow', background='lightgray')
 
 
 def pred_from_txt(args, model, device, start, output_file, tree):
@@ -139,3 +149,4 @@ def pred_from_txt(args, model, device, start, output_file, tree):
 
 if __name__ == "__main__":
     create_gui()
+
