@@ -15,7 +15,7 @@ def load_model(model_path, device):
     model.eval()
     return model
 
-def text_class_name(text, pred, args, output_file):
+def text_class_name(index, text, pred, args, output_file):
     results = torch.argmax(pred, dim=1)
     results = results.cpu().numpy().tolist()
     classification = open(args.classification, "r", encoding="utf-8").read().split("\n")
@@ -24,14 +24,15 @@ def text_class_name(text, pred, args, output_file):
     with open(output_file, 'a', encoding='utf-8') as file:
         if len(results) != 1:
             for i in range(len(results)):
-                file.write(f"文本：{text[i]}\t预测的类别为：{classification_dict[results[i]]}\n")
+                file.write(f"索引：{index[i]}\t文本：{text[i]}\t预测的类别为：{classification_dict[results[i]]}\n")
         else:
-            file.write(f"文本：{text}\t预测的类别为：{classification_dict[results[0]]}\n")
+            file.write(f"索引：{index[0]}\t文本：{text}\t预测的类别为：{classification_dict[results[0]]}\n")
 
 def pred_from_txt(args, model, device, start, output_file):
-    txt_path = 'topic_217915_posts_2.txt'  # 替换为你的 txt 文件路径
+    txt_path = 'input/topic_217915_posts.txt'  # 替换为你的 txt 文件路径
     with open(txt_path, 'r', encoding='utf-8') as file:
         lines = file.readlines()
+    indices = [line.strip().split('\t')[0] for line in lines]
     texts = [line.strip().split('\t')[1] for line in lines]
 
     x = MyDataset(texts, labels=None, with_labels=False)
@@ -40,7 +41,7 @@ def pred_from_txt(args, model, device, start, output_file):
     for batch_index, batch_con in enumerate(xDataloader):
         batch_con = tuple(p.to(device) for p in batch_con)
         pred = model(batch_con)
-        text_class_name(texts, pred, args, output_file)
+        text_class_name(indices, texts, pred, args, output_file)
 
     end = time.time()
     print(f"耗时为：{end - start} s")
@@ -51,9 +52,9 @@ if __name__ == "__main__":
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
     model = load_model(args.save_model_best, device)
 
-    output_file = 'output_217915_2.txt'
+    output_file = 'output/output_217915.txt'
     with open(output_file, 'w', encoding='utf-8') as file:
-        file.write("模型预测结果：\n")
+        file.write("索引\t文本\t模型预测结果\n")
 
     pred_from_txt(args, model, device, start, output_file)
 
