@@ -85,5 +85,5 @@ parser.add_argument("--max_len", type=int, default=38)
 # NIS3356
 
 1. 在bert-base-chinese文件夹下载bert 中文预训练模型（见/bert-base-chinese/README）
-2. 在model文件夹存放训练好的模型，请先下载：https://pan.quark.cn/s/501e0a757e6e
+2. 在model文件夹存放训练好的模型，请先下载：https://pan.quark.cn/s/a53540f93bd1
 3. `python test.py`
