@@ -124,6 +124,7 @@ def text_class_name(text, pred, args, output_file, tree):
             item = tree.insert('', 'end', values=(text, classification_dict[results[0]]))
             tree.item(item, tags='evenrow')
 
+<<<<<<< Updated upstream
     # 设置行的背景色
     tree.tag_configure('evenrow', background='white')
     tree.tag_configure('oddrow', background='lightgray')
@@ -131,6 +132,10 @@ def text_class_name(text, pred, args, output_file, tree):
 
 def pred_from_txt(args, model, device, start, output_file, tree):
     txt_path = 'topic_230779_posts.txt'  # 替换为你的 txt 文件路径
+=======
+def pred_from_txt(args, model, device, start, output_file):
+    txt_path = 'topic_217915_posts_2.txt'  # 替换为你的 txt 文件路径
+>>>>>>> Stashed changes
     with open(txt_path, 'r', encoding='utf-8') as file:
         lines = file.readlines()
     texts = [line.strip().split('\t')[1] for line in lines]
@@ -150,3 +155,13 @@ def pred_from_txt(args, model, device, start, output_file, tree):
 if __name__ == "__main__":
     create_gui()
 
+<<<<<<< Updated upstream
+=======
+    output_file = 'output_217915_2.txt'
+    with open(output_file, 'w', encoding='utf-8') as file:
+        file.write("模型预测结果：\n")
+
+    pred_from_txt(args, model, device, start, output_file)
+
+    print(f"预测结果已写入 {output_file}")
+>>>>>>> Stashed changes
