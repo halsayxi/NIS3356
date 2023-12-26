@@ -9,9 +9,10 @@ from torch.utils.data import DataLoader
 import torch
 from config import parsers
 from colorama import Fore, Style
+import summary  # 导入summary.py文件
 
 
-def run_main(tree, run_button, back_button):
+def run_main(tree, run_button, back_button, text_widget):
     # 你的main函数
     def main():
         start = time.time()
@@ -27,6 +28,11 @@ def run_main(tree, run_button, back_button):
 
         print(f"预测结果已写入 {output_file}")
 
+        # 调用summary.py的main函数，并将结果显示在GUI中
+        result = summary.main()
+        text_widget.insert(tk.END, result)
+        text_widget.see(tk.END)  # 自动滚动到最后一行
+
     # 使用一个新的线程来运行main函数，以防止它阻塞GUI
     threading.Thread(target=main).start()
 
@@ -38,34 +44,52 @@ def run_main(tree, run_button, back_button):
 def create_gui():
     window = tk.Tk()
     window.title("我的GUI")
-    window.geometry('800x600')  # 设置窗口大小
+    window.geometry('800x650')  # 设置窗口大小
+
+    # 创建一个标签，标记列表部分
+    label1 = tk.Label(window, text="评论列表：")
+    label1.pack()
 
     # 创建一个表格
-    tree = ttk.Treeview(window, columns=('评论内容', '判决结果'), show='headings', height=20)  # 设置高度为20行
-    tree.column('评论内容', width=400, anchor='center')  # 调整列的宽度
+    tree = ttk.Treeview(window, columns=('评论内容', '判决结果'), show='headings', height=15)  # 设置高度为20行
+    tree.column('评论内容', width=600, anchor='center')  # 调整列的宽度
     tree.column('判决结果', width=200, anchor='center')  # 调整列的宽度
     tree.heading('评论内容', text='评论内容')
     tree.heading('判决结果', text='判决结果')
     tree.pack()
+
+    # 创建一个分界线
+    separator = ttk.Separator(window, orient='horizontal')
+    separator.pack(fill='x')
+
+    # 创建一个标签，标记总结文本框部分
+    label2 = tk.Label(window, text="总结：")
+    label2.pack()
+
+    # 创建一个滚动文本框，用于显示summary.py的结果
+    text_widget = scrolledtext.ScrolledText(window, width=100, height=18)
+    text_widget.pack()
 
     # 创建一个运行按钮，点击时运行main函数
     run_button = tk.Button(window, text="运行")
     run_button.pack()
 
     # 创建一个返回按钮，但是默认是隐藏的
-    back_button = tk.Button(window, text="返回", command=lambda: back_to_main(tree, run_button, back_button))
+    back_button = tk.Button(window, text="返回",
+                            command=lambda: back_to_main(tree, run_button, back_button, text_widget))
     back_button.pack_forget()
 
     # 设置运行按钮的命令
-    run_button.config(command=lambda: run_main(tree, run_button, back_button))
+    run_button.config(command=lambda: run_main(tree, run_button, back_button, text_widget))
 
     window.mainloop()
 
 
-def back_to_main(tree, run_button, back_button):
-    # 清空Treeview控件
+def back_to_main(tree, run_button, back_button, text_widget):
+    # 清空Treeview控件和滚动文本框
     for i in tree.get_children():
         tree.delete(i)
+    text_widget.delete('1.0', tk.END)
 
     # 隐藏返回按钮，显示运行按钮
     back_button.pack_forget()
