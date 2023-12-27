@@ -14,11 +14,9 @@ pytorch、python
 # 项目目录：
 
 ```
-bert-TextCNN  
+NIS3356  
     |-- bert-base-chinese    bert 中文预训练模型     
-    |-- data                 数据集   
-    |-- image                存放模型相关图片
-    |-- logs                 训练日志               
+    |-- data                 数据集              
     |-- model                保存的模型               
     |-- config.py            配置文件                   
     |-- log.py               日志文件                 
@@ -28,6 +26,8 @@ bert-TextCNN
     |-- requirement.txt      需要的安装包
     |-- result.txt           训练一轮的结果
     |-- utils.py             数据处理文件
+    |-- Sound_Shape_Code     音节分析模型
+    |-- crawler              爬取网页内容
 ```
 
 # bert-TextCNN 模型结构图

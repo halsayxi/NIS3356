@@ -57,7 +57,7 @@ def create_gui():
     window.geometry('1000x800')  # 设置窗口大小
 
     # 创建一个标签，标记URL输入部分
-    label_url = tk.Label(window, text="请输入网站URL：")
+    label_url = tk.Label(window, text="请输入水源话题topic：")
     label_url.pack()
 
     # 创建一个框架，用于包含输入框和提交按钮
