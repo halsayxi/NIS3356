@@ -18,9 +18,9 @@ def read_csv_file(file_path):
     print(result)
     return result
 
-def main():
+def main(data):
     url = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie_bot_8k?access_token=" + get_access_token()
-    content = read_csv_file('../../../OneDrive/Desktop/topic_230779_posts.csv')
+    content = "\n".join(f"{i + 1}.{comment}" for i, comment in enumerate(data))
     payload = json.dumps({
         "messages": [
             {
