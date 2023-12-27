@@ -52,11 +52,15 @@ def main(topic_id):
             results.append((index, content, "legal", ""))
         else:
             results.append((index, content, "illegal", f"{variabt_word}"))
+        analyzed_label.config(text=f"已分析评论数: {len(results)}")
+        root.update()
     return results
+
 
 # tkinter UI
 def run_main():
     topic_id = entry.get()
+    analyzed_label.pack()
     entry.delete(0, 'end')
     results = main(topic_id)
     for index, result in enumerate(results):
@@ -64,7 +68,6 @@ def run_main():
         tree.insert('', 'end', values=result, tags=(tag,))
     submit_button['state'] = 'normal'
     back_button['state'] = 'normal'
-    loading_label.pack_forget()
 
 def submit():
     submit_button['state'] = 'disabled'
@@ -77,9 +80,10 @@ def back():
         tree.delete(i)
     submit_button['state'] = 'normal'
     back_button['state'] = 'disabled'
+    analyzed_label.pack_forget()
 
 def create_gui():
-    global root, entry, submit_button, back_button, tree, loading_label
+    global root, entry, submit_button, back_button, tree, loading_label, analyzed_label
     root = tk.Tk()
     root.geometry("800x1000")
     root.title("敏感词检测")
@@ -105,7 +109,8 @@ def create_gui():
     tree.tag_configure('illegalrow', background='lightcoral')
     tree.pack()
 
-    loading_label = tk.Label(root, text="正在读取中...")
+    loading_label = tk.Label(root, text="正在处理中...")
+    analyzed_label = tk.Label(root, text="")
 
     root.mainloop()
 

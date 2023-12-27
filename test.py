@@ -12,12 +12,11 @@ from colorama import Fore, Style
 import summary  # 导入summary.py文件
 from crawler import output_comments
 
-def run_main(tree, run_button, back_button, text_widget, entry, loading_label):
+def run_main(tree, run_button, back_button, text_widget, entry, loading_label, count_label):
     # 你的main函数
     def main():
         # 显示"正在读取中"的标签
         loading_label.pack()
-
         topic_id = entry.get()
         print(f"提交的topicID是：{topic_id}")
         entry.delete(0, tk.END)  # 清空输入框
@@ -31,7 +30,7 @@ def run_main(tree, run_button, back_button, text_widget, entry, loading_label):
         with open(output_file, 'w', encoding='utf-8') as file:
             file.write("模型预测结果：\n")
 
-        pred_from_data(args, model, device, start, output_file, tree, data)
+        pred_from_data(args, model, device, start, output_file, tree, data, count_label)
 
         print(f"预测结果已写入 {output_file}")
 
@@ -72,8 +71,11 @@ def create_gui():
     run_button = tk.Button(frame, text="提交")
     run_button.pack(side=tk.LEFT)
 
+    count_label = tk.Label(window, text="已经分析的评论数量：0")
+    count_label.pack_forget()
+
     # 创建一个标签，用于显示"正在读取中"的消息，但默认是隐藏的
-    loading_label = tk.Label(window, text="正在读取中...")
+    loading_label = tk.Label(window, text="正在处理中...")
     loading_label.pack_forget()
 
     # 创建一个标签，标记列表部分
@@ -104,16 +106,16 @@ def create_gui():
 
     # 创建一个返回按钮，但是默认是隐藏的
     back_button = tk.Button(window, text="返回",
-                            command=lambda: back_to_main(tree, run_button, back_button, text_widget))
+                            command=lambda: back_to_main(tree, run_button, back_button, text_widget, count_label))
     back_button.pack_forget()
 
     # 设置运行按钮的命令
-    run_button.config(command=lambda: run_main(tree, run_button, back_button, text_widget, url_entry, loading_label))
+    run_button.config(command=lambda: run_main(tree, run_button, back_button, text_widget, url_entry, loading_label, count_label))
 
     window.mainloop()
 
 
-def back_to_main(tree, run_button, back_button, text_widget):
+def back_to_main(tree, run_button, back_button, text_widget, count_label):
     # 清空Treeview控件和滚动文本框
     for i in tree.get_children():
         tree.delete(i)
@@ -122,6 +124,9 @@ def back_to_main(tree, run_button, back_button, text_widget):
     # 隐藏返回按钮，显示运行按钮
     back_button.pack_forget()
     run_button.pack()
+    count_label.config(text="已经分析的评论数量：0")
+    count_label.pack_forget()
+
 
 
 def load_model(model_path, device):
@@ -131,7 +136,8 @@ def load_model(model_path, device):
     return model
 
 
-def text_class_name(text, pred, args, output_file, tree):
+def text_class_name(text, pred, args, output_file, tree, count_label):
+    count_label.pack() #显示已经分析的评论数
     results = torch.argmax(pred, dim=1)
     results = results.cpu().numpy().tolist()
     classification = open(args.classification, "r", encoding="utf-8").read().split("\n")
@@ -158,6 +164,9 @@ def text_class_name(text, pred, args, output_file, tree):
                     tree.item(item, tags='evenrow')
                 else:
                     tree.item(item, tags='oddrow')
+
+                # 在UI界面实时输出已经分析完的评论个数
+                count_label.config(text=f"已经分析的评论数量：{row_number}")
         else:
             file.write(f"文本：{text}\t预测的类别为：{classification_dict[results[0]]}\n")
             # 插入行时添加行号
@@ -173,12 +182,16 @@ def text_class_name(text, pred, args, output_file, tree):
             else:
                 tree.item(item, tags='evenrow')
 
+            # 在UI界面实时输出已经分析完的评论个数
+            count_label.config(text=f"已经分析的评论数量：{row_number}")
+
     # 设置行的背景色
     tree.tag_configure('evenrow', background='white')
     tree.tag_configure('oddrow', background='lightgray')
     tree.tag_configure('illegalrow', background='lightcoral')  # 虹色1
 
-def pred_from_data(args, model, device, start, output_file, tree, data):
+
+def pred_from_data(args, model, device, start, output_file, tree, data, count_label):
 
     texts = data
 
@@ -188,7 +201,7 @@ def pred_from_data(args, model, device, start, output_file, tree, data):
     for batch_index, batch_con in enumerate(xDataloader):
         batch_con = tuple(p.to(device) for p in batch_con)
         pred = model(batch_con)
-        text_class_name(texts, pred, args, output_file, tree)
+        text_class_name(texts, pred, args, output_file, tree, count_label)
 
     end = time.time()
     print(f"耗时为：{end - start} s")
