@@ -31,7 +31,7 @@ def run_main(tree, run_button, back_button, text_widget, entry, loading_label):
         with open(output_file, 'w', encoding='utf-8') as file:
             file.write("模型预测结果：\n")
 
-        pred_from_txt(args, model, device, start, output_file, tree, data)
+        pred_from_data(args, model, device, start, output_file, tree, data)
 
         print(f"预测结果已写入 {output_file}")
 
@@ -178,7 +178,7 @@ def text_class_name(text, pred, args, output_file, tree):
     tree.tag_configure('oddrow', background='lightgray')
     tree.tag_configure('illegalrow', background='lightcoral')  # 虹色1
 
-def pred_from_txt(args, model, device, start, output_file, tree, data):
+def pred_from_data(args, model, device, start, output_file, tree, data):
 
     texts = data
 
