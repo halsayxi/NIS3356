@@ -1,5 +1,3 @@
-模型都未进行调参，未能使模型的准确率达到最高
-
 # 项目名称：
 
 使用 Bert + TextCNN 融合模型来对中文进行分类，即文本分类
@@ -52,11 +50,13 @@ Bert-Base除去第一层输入层，有12个encoder层，每个encode层的第�
 
 # 模型训练
 
-`python main.py`
+1. 在bert-base-chinese文件夹下载bert 中文预训练模型（见/bert-base-chinese/README）
+2. `python main.py`
 
 # 模型预测
 
-`python predict.py`
+1. 在model文件夹存放训练好的模型，已训练好的模型请下载：https://pan.quark.cn/s/a53540f93bd1
+2. `python test.py`
 
 # 训练自己的数据集
 
@@ -80,10 +80,3 @@ parser.add_argument("--class_num", type=int, default=10)
 parser.add_argument("--max_len", type=int, default=38)
 ```
 
-
-
-# NIS3356
-
-1. 在bert-base-chinese文件夹下载bert 中文预训练模型（见/bert-base-chinese/README）
-2. 在model文件夹存放训练好的模型，请先下载：https://pan.quark.cn/s/a53540f93bd1
-3. `python test.py`
