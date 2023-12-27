@@ -4,28 +4,15 @@ import requests
 API_KEY = "rvmb5iLe0pPoQSej2aboyIZP"
 SECRET_KEY = "fhxE7ufNdszDCZpUVhay57dqOtVyeuKQ"
 
-import csv
-
-def read_csv_file(file_path):
-    with open(file_path, 'r', encoding='utf-8') as file:
-        reader = csv.reader(file)
-        next(reader)  # Skip the header
-        result = ""
-        for index, row in enumerate(reader):
-            floor_number = row[0]
-            content = row[1]
-            result += f"{floor_number}.{content}\n"
-    print(result)
-    return result
-
 def main(data):
     url = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie_bot_8k?access_token=" + get_access_token()
-    content = "\n".join(f"{i + 1}.{comment}" for i, comment in enumerate(data))
+    content = "\n".join("标题." + data[0] if i == 0 else f"{i}.{comment}" for i, comment in enumerate(data))
+    print(content)
     payload = json.dumps({
         "messages": [
             {
                 "role": "user",
-                "content": "这是一篇讨论，第一层楼是主楼，其余是针对主楼的评论，请总结一下这些评论" + content
+                "content": "这是一篇讨论，第一层楼是主楼，其余是针对主楼的评论，请总结一下这些评论主要讲了什么，如果存在不同观点请分析" + content
             }
         ]
     })
