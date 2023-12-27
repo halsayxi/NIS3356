@@ -68,6 +68,7 @@ def run_main():
         tree.insert('', 'end', values=result, tags=(tag,))
     submit_button['state'] = 'normal'
     back_button['state'] = 'normal'
+    loading_label.pack_forget()
 
 def submit():
     submit_button['state'] = 'disabled'
