@@ -55,7 +55,7 @@ Bert-Base除去第一层输入层，有12个encoder层，每个encode层的第�
 
 # 模型预测
 
-1. 在model文件夹存放训练好的模型，已训练好的模型请下载：https://pan.quark.cn/s/a53540f93bd1
+1. 在model文件夹存放训练好的模型，已训练好的模型请下载：https://jbox.sjtu.edu.cn/l/G1Mt5V
 2. `python test.py`
 
 # 训练自己的数据集
