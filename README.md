@@ -1,4 +1,4 @@
-# 基于人工智能的水源社区帖子总结与敏感词检测
+# 敏感词分析的ERNIE方法
 本项目基于https://github.com/649453932/Bert-Chinese-Text-Classification-Pytorch
 
 ## 使用说明
