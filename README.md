@@ -45,9 +45,7 @@ Bert-Base除去第一层输入层，有12个encoder层，每个encode层的第�
 
 # 项目数据集
 
-数据集使用THUCNews中的train.txt、test.txt、dev.txt，为十分类问题。
-其中训练集一共有 180000 条，验证集一共有 10000 条，测试集一共有 10000 条。
-其类别为 finance、realty、stocks、education、science、society、politics、sports、game、entertainment 这十个类别。
+我们采取的训练数据集来自微博评论数据集、敏感词库、水源评论数据三部分。原始数据约1万条，被分割为长度不超过48的句子，并使用nlpcda进行数据增强，最终得到约4.5万条数据。
 
 # 模型训练
 
@@ -58,17 +56,6 @@ Bert-Base除去第一层输入层，有12个encoder层，每个encode层的第�
 
 1. 在model文件夹存放训练好的模型，已训练好的模型请下载：https://jbox.sjtu.edu.cn/l/G1Mt5V
 2. `python test.py`
-
-# 训练自己的数据集
-
-train.txt、dev.txt、test.txt 的数据格式：文本\t标签（数字表示）
-
-```
-体验2D巅峰 倚天屠龙记十大创新概览\t8   
-60年铁树开花形状似玉米芯(组图)\t5    
-```
-
-class.txt：标签类别（文本）
 
 ## 修改内容：
 
