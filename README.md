@@ -15,14 +15,15 @@ pytorch、python
 bert-TextCNN  
     |-- bert-base-chinese    bert 中文预训练模型     
     |-- data                 数据集   
-    |-- image                存放模型相关图片
-    |-- logs                 训练日志               
-    |-- model                保存的模型               
-    |-- config.py            配置文件                   
-    |-- log.py               日志文件                 
-    |-- main.py              主函数                      
+    |-- image                存放模型相关图片            
+    |-- model                保存的模型
+    |-- input                输入文件（爬取的帖子数据）            
+    |-- output               输出文件（敏感词检测结果）     
+    |-- config.py            配置文件                                  
+    |-- main.py              模型训练主函数                      
     |-- model.py             模型文件                     
-    |-- predict.py           预测文件                         
+    |-- predict.py           预测文件1
+    |-- test.py              预测文件2（适用于水源社区）                         
     |-- requirement.txt      需要的安装包
     |-- result.txt           训练一轮的结果
     |-- utils.py             数据处理文件
