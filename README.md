@@ -14,7 +14,7 @@ NIS3356
     |-- config.py            bert-配置文件   
     |-- main.py              bert-模型训练主函数
     |-- model.py             bert-模型文件 
-    |-- predict.py					 bert-模型预测
+    |-- predict.py		     bert-模型预测
     |-- summary.py           帖子摘要总结代码
     |-- test_ac.py           图形化交互文件1
     |-- test.py              图形化交互文件2
