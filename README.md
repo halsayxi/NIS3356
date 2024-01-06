@@ -1,66 +1,45 @@
-模型都未进行调参，未能使模型的准确率达到最高
+# 水源社区智能提取与言论审查系统
 
-# 项目名称：
 
-使用 Bert + TextCNN 融合模型来对中文进行分类，即文本分类
-Bert往往可以对一些表述隐晦的句子进行更好的分类，TextCNN往往对关键词更加敏感。
 
-# 项目环境：
-
-pytorch、python   
-相关库安装
-`pip install -r requirement.txt`
-
-# 项目目录：
+## 项目目录：
 
 ```
-NIS3356  
-    |-- bert-base-chinese    bert 中文预训练模型     
-    |-- data                 数据集              
-    |-- model                保存的模型               
-    |-- config.py            配置文件                   
-    |-- log.py               日志文件                 
-    |-- main.py              主函数                      
-    |-- model.py             模型文件                     
-    |-- predict.py           预测文件                         
-    |-- requirement.txt      需要的安装包
-    |-- result.txt           训练一轮的结果
-    |-- utils.py             数据处理文件
-    |-- Sound_Shape_Code     音节分析模型
-    |-- crawler              爬取网页内容
-```
-
-
-# 模型训练
-
-`python main.py`
-
-# 模型预测
-
-`python predict.py`
-
-# 训练自己的数据集
-
-train.txt、dev.txt、test.txt 的数据格式：文本\t标签（数字表示）
-
-class.txt：标签类别（文本）
-
-## 修改内容：
-
-在配置文件中修改长度、类别数、预训练模型地址    
-
-```
-parser.add_argument("--select_model_last", type=bool, default=True, help="选择模型")
-parser.add_argument("--bert_pred", type=str, default="./bert-base-chinese", help="bert 预训练模型")
-parser.add_argument("--class_num", type=int, default=10)   
-parser.add_argument("--max_len", type=int, default=38)
+NIS3356   
+    |-- bert-base-chinese    存放bert中文预训练模型  
+    |-- crawler              存放信息收集代码，包含信息收集需要的安装包requirement.txt
+    |-- data                 存放数据集   
+    |-- model                存放训练好的bert模型  
+    |-- Sound_Shape_Code     存放敏感词检测的音形码模型
+    |-- config.py            bert-配置文件   
+    |-- main.py              bert-模型训练主函数
+    |-- model.py             bert-模型文件 
+    |-- predict.py					 bert-模型预测
+    |-- summary.py           帖子摘要总结代码
+    |-- test_ac.py           图形化交互文件1
+    |-- test.py              图形化交互文件2
+    |-- requirement.txt      bert-需要的安装包
+    |-- result.txt           bert-训练一轮的结果
+    |-- utils.py             bert-数据处理文件
+    
 ```
 
 
 
-# NIS3356
+## 分支介绍：
 
-1. 在bert-base-chinese文件夹下载bert 中文预训练模型（见/bert-base-chinese/README）
-2. 在model文件夹存放训练好的模型，请先下载：https://pan.quark.cn/s/a53540f93bd1
-3. 运行基于Bert的敏感词分析与摘要`python test.py`
-4. 运行基于音节的敏感词分析`python test_ac.py`
+1. **main 分支：**代码仓库的主要分支，包含整个项目的最终版本，包括信息收集、摘要总结、敏感词分析以及图形化界面的所有功能。
+2. **crawler 分支：**信息收集的分支
+3. **Text\_Classification\_bert 分支：**关于敏感词分析中基于 BERT-base-chinese+TextCNN 架构的二分类方法的源代码，包括预训练模型、训练好的模型、训练和测试代码等，仅支持命令行交互。
+4. **Text\_Classification\_erine 分支：**同上，是敏感词分析中基于 ERNIE+Linear 架构的二分类方法的源代码。
+5. **Sound\_Shape\_Code 分支：**关于敏感词分析中音形码的源代码，包括敏感词库和测试代码，仅支持命令行交互。
+
+
+
+
+## 测试方法
+1. 在model文件夹下载训练好的模型：https://jbox.sjtu.edu.cn/l/G1Mt5V
+2. 在bert-base-chinese文件夹下载bert中文预训练模型：https://huggingface.co/bert-base-chinese/tree/main
+2. 在crawler/cookies.txt中添加自己的水源社区cookies
+3. 运行基于Bert的敏感词分析与帖子摘要：`python test.py`
+4. 运行基于音节的敏感词分析：`python test_ac.py`

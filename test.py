@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 import torch
 from config import parsers
 from colorama import Fore, Style
-import summary  # 导入summary.py文件
+import summary  
 from crawler import output_comments
 
 def run_main(tree, run_button, back_button, text_widget, entry, loading_label, count_label):

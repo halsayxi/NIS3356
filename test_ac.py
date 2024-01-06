@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import ttk
 import threading
 
-# 你的代码
 import Sound_Shape_Code.ssc
 from Sound_Shape_Code.kmp import VatiantKMP
 from crawler.output_comments import output_comments
